@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GuestAnchor — Diagram Preview v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0D1848;
+    --bg2: #14205C;
+    --text: #F4F6FB;
+
+    --c-publisher: #3FC5FF;
+    --c-content:   #FFB020;
+    --c-editorial: #8CD62B;
+    --c-website:   #B084F5;
+    --c-authority: #FF3B4E;   /* bright red, per request */
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(700px 500px at 72% 22%, rgba(140,214,43,.05), transparent 60%),
+      radial-gradient(600px 500px at 20% 85%, rgba(255,59,78,.06), transparent 60%),
+      radial-gradient(circle at 70% 30%, var(--bg2), var(--bg) 65%);
+    font-family: 'Inter', sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 60px 20px;
+  }
+
+  .stage{ position:relative; width: 640px; max-width: 100%; height: 480px; }
+
+  svg.lines{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+
+  .path{ fill:none; stroke-width: 1.4; opacity: .28; }
+  .flow{
+    fill:none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 7 260;
+    animation: travel 3s linear infinite;
+  }
+  .flow.d2{ animation-delay: .7s; }
+  .flow.d3{ animation-delay: 1.4s; }
+  .flow.d4{ animation-delay: 2.1s; }
+
+  @keyframes travel{
+    from{ stroke-dashoffset: 0; }
+    to{ stroke-dashoffset: -267; }
+  }
+
+  .node-wrap{
+    position:absolute;
+    opacity: 0;
+    transform: translateY(10px) scale(.95);
+  }
+  .node-wrap.in{ animation: rise .55s cubic-bezier(.2,.7,.2,1) forwards; }
+
+  .halo{
+    position:absolute;
+    inset: -26px;
+    border-radius: 20px;
+    background: var(--dot);
+    opacity: .16;
+    filter: blur(22px);
+    z-index: 0;
+  }
+
+  .node{
+    position: relative;
+    z-index: 1;
+    padding: 15px 21px;
+    border-radius: 12px;
+    background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.02) 60%), rgba(16,24,64,.55);
+    border: 1px solid rgba(255,255,255,.14);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14.5px;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    box-shadow:
+      0 14px 34px -14px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.08);
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+
+  .node::before{
+    content:'';
+    position:absolute;
+    left: 21px; top: -1px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--dot);
+    box-shadow: 0 0 10px 2px var(--dot);
+    transform: translateY(-50%);
+  }
+
+  .node-wrap:hover .node{
+    transform: translateY(-3px);
+    border-color: var(--dot);
+    box-shadow:
+      0 18px 40px -14px var(--dot-shadow),
+      inset 0 1px 0 rgba(255,255,255,.12);
+  }
+
+  @keyframes rise{ to{ opacity:1; transform: translateY(0) scale(1); } }
+
+  .n-publisher{ top: 20px;  left: 4px;   --dot: var(--c-publisher); --dot-shadow: rgba(63,197,255,.4); }
+  .n-content  { top: 130px; left: 132px; --dot: var(--c-content);   --dot-shadow: rgba(255,176,32,.4); }
+  .n-editorial{ top: 178px; left: 342px; --dot: var(--c-editorial); --dot-shadow: rgba(140,214,43,.4); }
+  .n-website  { top: 332px; left: 342px; --dot: var(--c-website);   --dot-shadow: rgba(176,132,245,.4); }
+  .n-authority{ top: 382px; left: 4px;   --dot: var(--c-authority); --dot-shadow: rgba(255,59,78,.45); }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <svg class="lines" id="lines" viewBox="0 0 640 480" preserveAspectRatio="none"></svg>
+
+  <div class="node-wrap n-publisher" id="publisher-wrap" style="animation-delay:.05s">
+    <div class="halo"></div>
+    <div class="node" id="publisher">Publisher</div>
+  </div>
+  <div class="node-wrap n-content" id="content-wrap" style="animation-delay:.2s">
+    <div class="halo"></div>
+    <div class="node" id="content">Content</div>
+  </div>
+  <div class="node-wrap n-editorial" id="editorial-wrap" style="animation-delay:.35s">
+    <div class="halo"></div>
+    <div class="node" id="editorial">Editorial Link</div>
+  </div>
+  <div class="node-wrap n-website" id="website-wrap" style="animation-delay:.5s">
+    <div class="halo"></div>
+    <div class="node" id="website">Your Website</div>
+  </div>
+  <div class="node-wrap n-authority" id="authority-wrap" style="animation-delay:.65s">
+    <div class="halo"></div>
+    <div class="node" id="authority">Authority</div>
+  </div>
+</div>
+
+<script>
+  // Publisher -> Content -> Editorial Link -> Your Website -> Authority (red, final step)
+  const connections = [
+    ['publisher', 'content',   'var(--c-publisher)', 'd1'],
+    ['content',   'editorial', 'var(--c-content)',   'd2'],
+    ['editorial', 'website',   'var(--c-editorial)', 'd3'],
+    ['website',   'authority', 'var(--c-authority)', 'd4'],
+  ];
+
+  function edgePoint(el, stageRect, towardsRect){
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width/2 - stageRect.left;
+    const cy = r.top + r.height/2 - stageRect.top;
+    const tx = towardsRect.left + towardsRect.width/2 - stageRect.left;
+    const ty = towardsRect.top + towardsRect.height/2 - stageRect.top;
+
+    const dx = tx - cx, dy = ty - cy;
+    const halfW = r.width/2, halfH = r.height/2;
+    const scaleX = dx !== 0 ? halfW / Math.abs(dx) : Infinity;
+    const scaleY = dy !== 0 ? halfH / Math.abs(dy) : Infinity;
+    const scale = Math.min(scaleX, scaleY);
+    return { x: cx + dx*scale, y: cy + dy*scale };
+  }
+
+  function draw(){
+    const svg = document.getElementById('lines');
+    const stage = document.getElementById('stage');
+    const stageRect = stage.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${stageRect.width} ${stageRect.height}`);
+    svg.innerHTML = '';
+
+    connections.forEach(([fromId, toId, color, delayClass]) => {
+      const fromEl = document.getElementById(fromId);
+      const toEl = document.getElementById(toId);
+      const fromRect = fromEl.getBoundingClientRect();
+      const toRect = toEl.getBoundingClientRect();
+
+      const p1 = edgePoint(fromEl, stageRect, toRect);
+      const p2 = edgePoint(toEl, stageRect, fromRect);
+
+      const mx = (p1.x + p2.x) / 2;
+      const d = `M${p1.x},${p1.y} Q${mx},${p1.y} ${p2.x},${p2.y}`;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('class', 'path');
+      path.setAttribute('stroke', color);
+      svg.appendChild(path);
+
+      const flow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      flow.setAttribute('d', d);
+      flow.setAttribute('class', 'flow ' + delayClass);
+      flow.setAttribute('stroke', color);
+      flow.style.filter = `drop-shadow(0 0 5px ${color})`;
+      svg.appendChild(flow);
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    draw();
+    document.querySelectorAll('.node-wrap').forEach(el => el.classList.add('in'));
+    setTimeout(draw, 600);
+  });
+  window.addEventListener('resize', draw);
+</script>
+
+</body>
+</html>
